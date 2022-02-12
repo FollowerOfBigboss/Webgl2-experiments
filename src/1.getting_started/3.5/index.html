@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<script type="module" src="index.js"></script>
+	</head>
+	<body> 
+		<script id="vertex" type="x-shader/x-vertex">#version 300 es
+	                layout (location = 0) in vec3 aPos;
+	                layout (location = 1) in vec3 aColor;
+	                out vec3 ourColor;
+			uniform float xOffset;
+	                void main() {
+	                        gl_Position = vec4(aPos.x + xOffset, aPos.y, aPos.z, 1.0);
+	                        ourColor = aColor;
+	                }
+		</script>
+		
+		<script id="fragment" type="x-shader/x-fragment">#version 300 es
+                 	precision highp float;
+                 	out vec4 FragColor;
+                  	in vec3 ourColor;
+                  	void main() {
+                        	FragColor = vec4(ourColor, 1.0);
+                  	}
+		</script>
+
+		<canvas id="glctx" width="640" height="480"></canvas>
+	</body>
+<html>

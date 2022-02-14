@@ -83,8 +83,8 @@ function main() {
   	};
 	
 	ourShader.use();
-	ourShader.setInt("texture1", 0);
-	ourShader.setInt("texture2", 1);
+	ourShader.setInt("ourTexture1", 0);
+	ourShader.setInt("ourTexture2", 1);
 		
 	function render(now)
 	{

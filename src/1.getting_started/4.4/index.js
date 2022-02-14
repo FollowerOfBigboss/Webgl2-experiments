@@ -18,10 +18,10 @@ function main() {
 	var ourShader = new Shader(gl, "vertex", "fragment");
 			 
 	const vertices = [
-		 0.5,  0.5, 0.0,  1.0, 0.0, 0.0,  1.0, 1.0,
-	 	 0.5, -0.5, 0.0,  0.0, 1.0, 0.0,  1.0, 0.0,
+		 0.5,  0.5, 0.0,  1.0, 0.0, 0.0,  2.0, 2.0,
+	 	 0.5, -0.5, 0.0,  0.0, 1.0, 0.0,  2.0, 0.0,
 		-0.5, -0.5, 0.0,  0.0, 0.0, 1.0,  0.0, 0.0,
-		-0.5,  0.5, 0.0,  1.0, 1.0, 0.0,  0.0, 1.0
+		-0.5,  0.5, 0.0,  1.0, 1.0, 0.0,  0.0, 2.0
 	];
 
 	const indices = [
@@ -51,8 +51,8 @@ function main() {
 
 	const texture1 = gl.createTexture();
   	gl.bindTexture(gl.TEXTURE_2D, texture1);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 255, 255]));

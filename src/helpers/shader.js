@@ -43,6 +43,7 @@ export class Shader
 	
 	use() {
 		this.gl.useProgram(this.program);
+
 	}
 	
 	setBool(name, value) {
@@ -58,5 +59,10 @@ export class Shader
 	setFloat(name, value) {
 		const loc = this.gl.getUniformLocation(this.program, name);
 		this.gl.uniform1f(loc, value);				
+	}
+
+	setMat4(name, value){
+		const loc = this.gl.getUniformLocation(this.program, name);
+		this.gl.uniformMatrix4fv(loc, false, value);
 	}
 }

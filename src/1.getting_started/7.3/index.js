@@ -131,36 +131,94 @@ function main() {
 	ourShader.setInt("texture1", 0);
 	ourShader.setInt("texture2", 1);
 
-
-	let projection = glMatrix.mat4.create();	
-	glMatrix.mat4.perspective(projection, glMatrix.glMatrix.toRadian(45.0), 800/600, 0.1, 100.0);
-	ourShader.setMat4("projection", projection);
+	var yaw = -90.0;
+	var pitch = 0;
+	var fov = 45.0;	
+	var mouseLocked = false;
 
 	// https://www.gavsblog.com/blog/detect-single-and-multiple-keypress-events-javascript
 	let keysPressed = {};
 	document.addEventListener('keydown', (event) => {
-   		keysPressed[event.key] = true;
-		// console.log("keydown event " + event.key);
+                keysPressed[event.key] = true;
 	});
 	document.addEventListener('keyup', (event) => {
-		keysPressed[event.key] = false;
-		// console.log("keyup event " + event.key);
- 	});
-	
-	canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
-	document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
+                keysPressed[event.key] = false;
+	});
+
+	// pointerlock things
+	const pointerlockchangeexist = ("onpointerlockchange" in document)==true;
+	if (pointerlockchangeexist) {
+		document.addEventListener('pointerlockchange', () => {
+			if(document.pointerLockElement === canvas) {
+				mouseLocked = true;
+    				// console.log('The pointer lock status is now locked');
+  			} else {
+				mouseLocked = false;
+    				// console.log('The pointer lock status is now unlocked');
+  			}
+		}, false);
+        }
+	document.addEventListener('pointerlockerror', () => { 
+		// console.log('Pointerlock failed!');
+		mouseLocked = false; 
+	}, false);
 	
 	canvas.onclick = function(event) {
-  		var rect = canvas.getBoundingClientRect();
-    		var x = event.clientX - rect.left;
-    		var y = event.clientY - rect.top;
-    		console.log("x: " + x + " y: " + y); 
+		const rect = canvas.getBoundingClientRect();
+		const x = event.clientX - rect.left;
+		const y = event.clientY - rect.top;
 		canvas.requestPointerLock();
+		mouseLocked = true;	
 	};
-	document.addEventListener("mousemove", (event) => {
-		// console.log(event.movementX);
-	}, false);
+	
+	canvas.addEventListener('wheel', (event) => {
+		const wheelDelta = event.deltaY > 0 ? -1 : 1;
+		fov -= wheelDelta;
+		if (fov < 1.0) {
+			fov = 1.0;
+		} 
+		if (fov > 45.0 ){
+			fov = 45.0;
+		}
+	});
+
+	document.addEventListener("mousemove", (event) => {	
+		// No lock no processing
+		if (mouseLocked != true)
+			return;
 		
+		let xoffset = event.movementX;
+		// Revert y axis
+		let yoffset = -event.movementY;		
+
+		const sensivity = 0.1;
+		xoffset *= sensivity;
+		yoffset *= sensivity;
+	
+		yaw   += xoffset;
+		pitch += yoffset;
+		
+		if (pitch > 89.0) {
+			pitch = 89.0;
+		} 
+		if (pitch < -89.0 ){
+			pitch = -89.0;
+		}
+		
+		const rYaw = glMatrix.glMatrix.toRadian(yaw);
+		const rPitch = glMatrix.glMatrix.toRadian(pitch);
+
+		const x = Math.cos(rYaw) * Math.cos(rPitch);
+		const y = Math.sin(rPitch);
+		const z = Math.sin(rYaw) * Math.cos(rPitch);
+		
+		let front = glMatrix.vec3.fromValues(x,y,z);
+		glMatrix.vec3.normalize(cameraFront, front); 
+	}, false);
+   
+
+
+ 
 	function processInput()
 	{	
 		var cameraSpeed = 2.5 * deltaTime;
@@ -209,6 +267,11 @@ function main() {
 		
 		ourShader.use();
 
+
+		let projection = glMatrix.mat4.create();	
+		glMatrix.mat4.perspective(projection, glMatrix.glMatrix.toRadian(fov), 800/600, 0.1, 100.0);
+		ourShader.setMat4("projection", projection);
+	
 		let view  = glMatrix.mat4.create();
 		var cv = glMatrix.vec3.create();
 		glMatrix.vec3.add(cv, cameraPos, cameraFront)
@@ -225,7 +288,6 @@ function main() {
 			ourShader.setMat4("model", model);
 			gl.drawArrays(gl.TRIANGLES, 0, 36);
 		}
-
 		requestAnimationFrame(render);
 	}
 	requestAnimationFrame(render);

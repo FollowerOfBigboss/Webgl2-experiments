@@ -1,22 +1,7 @@
 export class Shader
 {
+	gl;
 	program;
-	gl;	
-	checkCompileErrors(shader, isItProgram = false) {
-		if (isItProgram == false) {
-			if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-                		alert("An error occurred compiling the shaders: " + this.gl.getShaderInfoLog(shader));
-                		return ;
-          		}
-		}
-		else {
-			if (!this.gl.getProgramParameter(shader, this.gl.LINK_STATUS)) {
-                  		alert("An error occurred compiling the program: " + this.gl.getProgramInfoLog(shaderProgram));
-                  		return;
-          		}
-		}
-	}
-	
 	constructor(gl, vertexShaderID, fragmentShaderID) {
 		const vs = document.getElementById(vertexShaderID);
 		const fs = document.getElementById(fragmentShaderID);
@@ -64,5 +49,19 @@ export class Shader
 	setMat4(name, value){
 		const loc = this.gl.getUniformLocation(this.program, name);
 		this.gl.uniformMatrix4fv(loc, false, value);
+	}
+
+
+	checkCompileErrors(shader, isItProgram = false) {
+		if (isItProgram == false) {
+			if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
+                		alert("An error occurred compiling the shaders: " + this.gl.getShaderInfoLog(shader));
+          		}
+		}
+		else {
+			if (!this.gl.getProgramParameter(shader, this.gl.LINK_STATUS)) {
+                  		alert("An error occurred compiling the program: " + this.gl.getProgramInfoLog(shaderProgram));
+          		}
+		}
 	}
 }

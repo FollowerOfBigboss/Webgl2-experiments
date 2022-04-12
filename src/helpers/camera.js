@@ -27,18 +27,11 @@ export class Camera {
 	Zoom;
 
 	constructor() { 
-		/*
-		this.Position = glMatrix.vec3.fromValues(0.0, 0.0, 0.0);
-		this.Front = glMatrix.vec3.fromValues(0.0, 0.0, -1.0);
-		this.Up = glMatrix.vec3.fromValues(0.0, 0.0, 0.0);	
-		this.WorldUp = glMatrix.vec3.fromValues(0.0, 1.0, 0.0);	
-		*/
-
-		this.Position = 0;
+		this.Position = glMatrix.vec3.create();
 		this.Front = glMatrix.vec3.create();
 		this.Up = glMatrix.vec3.create();
 		this.Right = glMatrix.vec3.create();
-		this.WorldUp = 0;	
+		this.WorldUp = glMatrix.vec3.create();	
 
 		this.Yaw = YAW;	
 		this.Pitch = PITCH;

@@ -1,0 +1,54 @@
+<html>
+	<head>
+		<script type="module" src="index.js"></script>
+	</head>
+	<body> 
+		<script id="colors_vs" type="x-shader/x-vertex">#version 300 es
+			layout (location = 0) in vec3 aPos;
+			
+			uniform mat4 model;
+			uniform mat4 view;
+			uniform mat4 projection;			
+			
+			void main() {
+				gl_Position = projection * view * model * vec4(aPos, 1.0);
+			}
+		</script>
+		
+		<script id="colors_fs" type="x-shader/x-fragment">#version 300 es
+			precision highp float;
+			out vec4 FragColor;
+			
+			uniform vec3 objectColor;
+			uniform vec3 lightColor;
+			
+			void main() {
+				FragColor = vec4(lightColor * objectColor, 1.0);
+			}
+		</script>
+		
+
+		<script id="light_cube_vs" type="x-shader/x-vertex">#version 300 es
+			layout (location = 0) in vec3 aPos;
+			
+			uniform mat4 model;
+			uniform mat4 view;
+			uniform mat4 projection;
+			
+			void main() {
+				gl_Position = projection * view * model * vec4(aPos,1.0);
+			}
+		</script>
+
+		<script id="light_cube_fs" type="x-shader/x-fragment">#version 300 es
+			precision highp float;
+			out vec4 FragColor;
+		
+			void main() {
+				FragColor = vec4(1.0);
+			}
+		</script>
+
+		<canvas id="glctx" width="800" height="600"></canvas>
+	</body>
+<html>

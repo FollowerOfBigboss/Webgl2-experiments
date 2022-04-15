@@ -50,6 +50,11 @@ export class Shader
 		const loc = this.gl.getUniformLocation(this.program, name);
 		this.gl.uniform3f(loc, x, y, z);
 	}
+
+	setVec3v(name, vec) {
+		const loc = this.gl.getUniformLocation(this.program, name);
+		this.gl.uniform3f(loc, vec[0], vec[1], vec[2]);
+	}
 	
 	setMat4(name, value){
 		const loc = this.gl.getUniformLocation(this.program, name);

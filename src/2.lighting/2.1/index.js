@@ -19,47 +19,47 @@ function main() {
 	var lastFrame = 0.0;
  
 	const vertices = [
-		-0.5, -0.5, -0.5,
-		0.5, -0.5, -0.5, 
-		0.5,  0.5, -0.5, 
-		0.5,  0.5, -0.5, 
-		-0.5,  0.5, -0.5,
-		-0.5, -0.5, -0.5,
+		-0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
+		 0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
+		 0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+		 0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+		-0.5,  0.5, -0.5,  0.0,  0.0, -1.0,
+		-0.5, -0.5, -0.5,  0.0,  0.0, -1.0,
 
-		-0.5, -0.5,  0.5,
-		0.5, -0.5,  0.5, 
-		0.5,  0.5,  0.5, 
-		0.5,  0.5,  0.5, 
-		-0.5,  0.5,  0.5,
-		-0.5, -0.5,  0.5,
+		-0.5, -0.5,  0.5,  0.0,  0.0,  1.0,
+		 0.5, -0.5,  0.5,  0.0,  0.0,  1.0,
+		 0.5,  0.5,  0.5,  0.0,  0.0,  1.0,
+		 0.5,  0.5,  0.5,  0.0,  0.0,  1.0,
+		-0.5,  0.5,  0.5,  0.0,  0.0,  1.0,
+		-0.5, -0.5,  0.5,  0.0,  0.0,  1.0,
 
-		-0.5,  0.5,  0.5,
-		-0.5,  0.5, -0.5,
-		-0.5, -0.5, -0.5,
-		-0.5, -0.5, -0.5,
-		-0.5, -0.5,  0.5,
-		-0.5,  0.5,  0.5,
+		-0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
+		-0.5,  0.5, -0.5, -1.0,  0.0,  0.0,
+		-0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
+		-0.5, -0.5, -0.5, -1.0,  0.0,  0.0,
+		-0.5, -0.5,  0.5, -1.0,  0.0,  0.0,
+		-0.5,  0.5,  0.5, -1.0,  0.0,  0.0,
 
-		0.5,  0.5,  0.5, 
-		0.5,  0.5, -0.5, 
-		0.5, -0.5, -0.5, 
-		0.5, -0.5, -0.5, 
-		0.5, -0.5,  0.5, 
-		0.5,  0.5,  0.5, 
+		 0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
+		 0.5,  0.5, -0.5,  1.0,  0.0,  0.0,
+		 0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
+		 0.5, -0.5, -0.5,  1.0,  0.0,  0.0,
+		 0.5, -0.5,  0.5,  1.0,  0.0,  0.0,
+		 0.5,  0.5,  0.5,  1.0,  0.0,  0.0,
 
-		-0.5, -0.5, -0.5,
-		0.5, -0.5, -0.5, 
-		0.5, -0.5,  0.5, 
-		0.5, -0.5,  0.5, 
-		-0.5, -0.5,  0.5,
-		-0.5, -0.5, -0.5,
+		-0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+		 0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
+		 0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+		 0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+		-0.5, -0.5,  0.5,  0.0, -1.0,  0.0,
+		-0.5, -0.5, -0.5,  0.0, -1.0,  0.0,
 
-		-0.5,  0.5, -0.5,
-		0.5,  0.5, -0.5, 
-		0.5,  0.5,  0.5, 
-		0.5,  0.5,  0.5, 
-		-0.5,  0.5,  0.5,
-		-0.5,  0.5, -0.5,
+		-0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+		 0.5,  0.5, -0.5,  0.0,  1.0,  0.0,
+		 0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+		 0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+		-0.5,  0.5,  0.5,  0.0,  1.0,  0.0,
+		-0.5,  0.5, -0.5,  0.0,  1.0,  0.0
 	];
 
 	var mouseLocked = false;
@@ -133,26 +133,29 @@ function main() {
 
 
 	gl.enable(gl.DEPTH_TEST);
-	var lightingShader  = new Shader(gl, "colors_vs", "colors_fs");
+	var lightingShader  = new Shader(gl, "basic_lighting_vs", "basic_lighting_fs");
 	var lightCubeShader = new Shader(gl, "light_cube_vs", "light_cube_fs");
 
 	var cubeVAO = gl.createVertexArray();
 	var VBO = gl.createBuffer();
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, VBO);	
+	gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);		
 
 	gl.bindVertexArray(cubeVAO);
 
-	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
+	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 0);
 	gl.enableVertexAttribArray(0);
+
+	gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3*Float32Array.BYTES_PER_ELEMENT);
+	gl.enableVertexAttribArray(1);
 	
 	var lightCubeVAO = gl.createVertexArray();
 	gl.bindVertexArray(lightCubeVAO);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, VBO);	
 
-	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
+	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 0);
 	gl.enableVertexAttribArray(0);
 
 
@@ -166,11 +169,12 @@ function main() {
 		processInput();
 
 		gl.clearColor(0.1, 0.1, 0.1, 1.0);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);	
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 		lightingShader.use();
 		lightingShader.setVec3("objectColor", 1.0, 0.5, 0.31);
 		lightingShader.setVec3("lightColor" , 1.0, 1.0, 1.0);
+		lightingShader.setVec3v("lightPos", lightPos);
 
 		let projection = glMatrix.mat4.create();	
 		glMatrix.mat4.perspective(projection, glMatrix.glMatrix.toRadian(camera.Zoom), 800/600, 0.1, 100.0);	

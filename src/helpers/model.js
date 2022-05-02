@@ -60,16 +60,18 @@ export class Model {
 		this.indices = [];
 	}
 	
-	getModelFromUrl(url /*, callback*/) {
+	getModelFromUrl(url , callback) {
 		var request = new XMLHttpRequest();
 		const bthis = this;
-			request.addEventListener("load", function() {
+
+		request.addEventListener("load", function() {
 			bthis.content = this.responseText;
 			if (this.status == 200) {
 				bthis.loadModel();
-				//      callback(this.responseText);
+				callback(bthis);
 			}
 		});
+
 		request.open("GET", url);
 		request.send();
 	}
@@ -104,7 +106,7 @@ export class Model {
 
 				if (s[0] === 'f') {
 					let line = ProcessLineNumbers(this.content, i);
-					this.indices.push(line[0], line[1], line[2], line[3]);
+					this.indices.push(line[0]-1, line[1]-1, line[2]-1);
 				}
 			}
 			i+=s[1];

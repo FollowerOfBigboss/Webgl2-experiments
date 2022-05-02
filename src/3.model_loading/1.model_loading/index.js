@@ -95,62 +95,35 @@ function processInput(camera) {
 var deltaTime = 0.0;
 var lastFrame = 0.0;
 
-const vertices = [
-	-0.5, -0.5, -0.5,  0.0, 0.0,
-	0.5, -0.5, -0.5,  1.0, 0.0,
-	0.5,  0.5, -0.5,  1.0, 1.0,
-	0.5,  0.5, -0.5,  1.0, 1.0,
-	-0.5,  0.5, -0.5,  0.0, 1.0,
-	-0.5, -0.5, -0.5,  0.0, 0.0,
+var vertices;
+var indices;
 
-	-0.5, -0.5,  0.5,  0.0, 0.0,
-	0.5, -0.5,  0.5,  1.0, 0.0,
-	0.5,  0.5,  0.5,  1.0, 1.0,
-	0.5,  0.5,  0.5,  1.0, 1.0,
-	-0.5,  0.5,  0.5,  0.0, 1.0,
-	-0.5, -0.5,  0.5,  0.0, 0.0,
-
-	-0.5,  0.5,  0.5,  1.0, 0.0,
-	-0.5,  0.5, -0.5,  1.0, 1.0,
-	-0.5, -0.5, -0.5,  0.0, 1.0,
-	-0.5, -0.5, -0.5,  0.0, 1.0,
-	-0.5, -0.5,  0.5,  0.0, 0.0,
-	-0.5,  0.5,  0.5,  1.0, 0.0,
-
-	0.5,  0.5,  0.5,  1.0, 0.0,
-	0.5,  0.5, -0.5,  1.0, 1.0,
-	0.5, -0.5, -0.5,  0.0, 1.0,
-	0.5, -0.5, -0.5,  0.0, 1.0,
-	0.5, -0.5,  0.5,  0.0, 0.0,
-	0.5,  0.5,  0.5,  1.0, 0.0,
-
-	-0.5, -0.5, -0.5,  0.0, 1.0,
-	0.5, -0.5, -0.5,  1.0, 1.0,
-	0.5, -0.5,  0.5,  1.0, 0.0,
-	0.5, -0.5,  0.5,  1.0, 0.0,
-	-0.5, -0.5,  0.5,  0.0, 0.0,
-	-0.5, -0.5, -0.5,  0.0, 1.0,
-
-	-0.5,  0.5, -0.5,  0.0, 1.0,
-	0.5,  0.5, -0.5,  1.0, 1.0,
-	0.5,  0.5,  0.5,  1.0, 0.0,
-	0.5,  0.5,  0.5,  1.0, 0.0,
-	-0.5,  0.5,  0.5,  0.0, 0.0,
-	-0.5,  0.5, -0.5,  0.0, 1.0
-];
-
-const cubePositions = [
-	glMatrix.vec3.fromValues(0.0, 0.0, 0.0),
-	glMatrix.vec3.fromValues(2.0, 5.0, -15.0),
-	glMatrix.vec3.fromValues(-1.5, -2.2, -2.5),
-	glMatrix.vec3.fromValues(-3.8, -2.0, -12.3),
-	glMatrix.vec3.fromValues(2.4, -0.4, -3.5),
-	glMatrix.vec3.fromValues(-1.7, 3.0, -7.5),
-	glMatrix.vec3.fromValues(1.3, -2.0, -2.5),
-	glMatrix.vec3.fromValues(1.5, 2.0, -2.5),
-	glMatrix.vec3.fromValues(1.5,  0.2, -1.5),
-	glMatrix.vec3.fromValues(-1.3,  1.0, -1.5)
-];
+const buffer = `
+# Blender v3.1.2 OBJ File: ''
+# www.blender.org
+o Cube_Cube.001
+v -1.000000 -1.000000 1.000000
+v -1.000000 1.000000 1.000000
+v -1.000000 -0.221318 -1.000000
+v -1.000000 0.221318 -1.000000
+v 1.000000 -1.000000 1.000000
+v 1.000000 1.000000 1.000000
+v 1.000000 -0.221318 -1.000000
+v 1.000000 0.221318 -1.000000
+s off
+f 2 3 1
+f 4 7 3
+f 8 5 7
+f 6 1 5
+f 7 1 3
+f 4 6 8
+f 2 4 3
+f 4 8 7
+f 8 6 5
+f 6 2 1
+f 7 5 1
+f 4 2 6
+`;
 
 
 function main() {
@@ -170,28 +143,52 @@ function main() {
 		const wheelDelta = event.deltaY > 0 ? -1 : 1;
 		camera.init_1(glMatrix.vec3.fromValues(0.0, 0.0, 3.0));
 	});
+
+	var model = new Model();
+	/*
+	model.getModelFromBuffer(buffer);
+	vertices = model.positions;
+	indices = model.indices;
+	*/
 	
 	gl.enable(gl.DEPTH_TEST);
 
 	var ourShader = new Shader(gl, "vertex", "fragment");
 	var VAO = gl.createVertexArray();
 	var VBO = gl.createBuffer();
+	var EBO = gl.createBuffer();
 
+	var model = new Model();
+	var loaded = false;
+	model.getModelFromUrl("./monki.obj", (tthis) => {
+		vertices = tthis.positions;
+		indices = tthis.indices;
+
+		
+		gl.bindVertexArray(VAO);
+		gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+	
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), gl.STATIC_DRAW);
+
+		gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
+		gl.enableVertexAttribArray(0);
+		
+		loaded = true;
+	});
+	
+	/*
 	gl.bindVertexArray(VAO);
 	gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 	
-	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 0);
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, EBO);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(indices), gl.STATIC_DRAW);
+
+	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
 	gl.enableVertexAttribArray(0);
-	gl.vertexAttribPointer(1, 2, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
-	gl.enableVertexAttribArray(1);
-    
-	const texture1 = loadTexture(gl, "../../tex/container.jpg");
-	const texture2 = loadTexture(gl, "../../tex/awesomeface.png");
-	
-	ourShader.use();
-	ourShader.setInt("texture1", 0);
-	ourShader.setInt("texture2", 1);
+    	*/
 
 	function render(now)
 	{
@@ -203,11 +200,6 @@ function main() {
 		
 		gl.clearColor(0.2, 0.3, 0.3, 1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, texture1);
-		gl.activeTexture(gl.TEXTURE1);
-		gl.bindTexture(gl.TEXTURE_2D, texture2);
 		
 		ourShader.use();
 
@@ -218,17 +210,14 @@ function main() {
 
 		let view = camera.GetViewMatrix();
 		ourShader.setMat4("view", view);
+		let model = glMatrix.mat4.create();
 
-		gl.bindVertexArray(VAO);
-		for (let i = 0; i < cubePositions.length; i++) {
-			let model = glMatrix.mat4.create();
-			glMatrix.mat4.translate(model, model, cubePositions[i]);
-			let angle = 20.0 * i;
-
-			glMatrix.mat4.rotate(model, model, glMatrix.glMatrix.toRadian(angle), glMatrix.vec3.fromValues(1.0, 0.3, 0.5));
+		if (loaded) {
+			gl.bindVertexArray(VAO);
 			ourShader.setMat4("model", model);
-			gl.drawArrays(gl.TRIANGLES, 0, 36);
+			gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_INT, 0);	
 		}
+
 		requestAnimationFrame(render);	
 	}
 	requestAnimationFrame(render);

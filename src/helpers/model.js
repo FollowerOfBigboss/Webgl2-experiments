@@ -1,117 +1,113 @@
-function isLetter(str) {
-	return str.length === 1 && str.match(/[a-z]/i);
-}
 
-function ProcessLineNumbers(content, i) {
-	let str = '';
-	const bi = i;
-	var cc = content[i];
-	let numArr = [];
-	while (cc != '\n') {
-		cc = content[i];
-		if ((cc >= '0' && cc <= '9') || cc=='.' || cc=='-') {
-			str += cc;
-		}
-		if (cc == ' ') {
-			if (str.length > 0) {
-				numArr.push(parseFloat(str));
-				str = '';
-			}
-		}
-		i++;
-	}
-	if (str.length > 0) {
-		numArr.push(parseFloat(str));
-		str = '';
-	}
-	return numArr;
-}
-
-function ProcessToken(content, i) {
-	const bi = i;
-	var cc = content[i];
-	let str = '';
-
-	if (cc == ' ' || cc == '\n' || cc == '\t' || cc == '\r') {
-		i++;
-		return [str, (i-bi)];
-	}
-
-	while (cc != '\n') {
-		cc = content[i];
-		if (cc == ' ' || cc == '\t') {
-			do {
-				cc = content[i];
-				i++;
-			} while(cc != '\n');
-			break;
-		}
-		str += cc;
-		i++;
-	}
-
-	return [str, (i-bi)];
+function GetLine(buffer, pos = 0) {
+  const backupPos = pos;
+  let i = backupPos;
+  let line = "";
+  while (buffer[i] != '\n') {
+    line += buffer[i];
+    i++;
+  }
+  return {str:line, diff:(i-backupPos)+1};
 }
 
 export class Model {
-	constructor() {
-		this.content = null;
-		this.positions = [];
-		this.indices = [];
-	}
+  constructor() {
+    this.content = null;
+
+    this.positions = [];
+    this.texcoords = [];
+    this.normals = [];
+
+    this.indices = [];
+    this.texindices = [];
+    this.normindices = [];
+ }
 	
-	getModelFromUrl(url , callback) {
-		var request = new XMLHttpRequest();
-		const bthis = this;
+  getModelFromUrl(url , callback) {
+    var request = new XMLHttpRequest();
+    const bthis = this;
 
-		request.addEventListener("load", function() {
-			bthis.content = this.responseText;
-			if (this.status == 200) {
-				bthis.loadModel();
-				callback(bthis);
-			}
-		});
+    request.addEventListener("load", function() {
+      bthis.content = this.responseText;
+      if (this.status == 200) {
+        bthis.loadModel();
+        callback(bthis);
+      }
+    });
 
-		request.open("GET", url);
-		request.send();
-	}
+    request.open("GET", url);
+    request.send();
+ }
 
-	getModelFromBuffer(buffer) {
-		this.content = buffer;
-		this.loadModel();
-	}
+ getModelFromBuffer(buffer) {
+   this.content = buffer;
+   this.loadModel();  
+ }
 
-	loadModel() {
-		let sLength = this.content.length;
-		let i = 0;
+  loadModel() {
+    const contentLength = this.content.length;
+    let i = 0;
  
-		while (i < sLength) {
-			let s = ProcessToken(this.content, i);
-			if (s[0].length > 0) {
-				if (s[0] === 'v') {
-					let line = ProcessLineNumbers(this.content, i);
-					this.positions.push(line[0], line[1], line[2]);
-					// console.log(s[0], line);
-				}
+    while (i < contentLength) {
+      const line = GetLine(this.content, i);
+      this.processTokens(line["str"]);
+      i += line["diff"];
+    }
+  }
+
+  processTokens(rawLine) {
+    const tokens = rawLine.split(' ');
+    const tokenCount = tokens.length;
+
+    if (tokens[0] === 'v') {
+      const positionCount = tokenCount - 1;
+      if (positionCount > 3) {
+        this.positions.push(parseFloat(tokens[1]), parseFloat(tokens[2]), parseFloat(tokens[3]), parseFloat(tokens[4]));
+      } 
+      else { 
+        this.positions.push(parseFloat(tokens[1]), parseFloat(tokens[2]), parseFloat(tokens[3]));
+      }
+    }
 	
-				if (s[0] === 'vt') {
-					let line = ProcessLineNumbers(this.content, i);
-					// console.log(s[0], line);
-				}
+    if (tokens[0] === 'vt') {
+      const texcoordsCount = tokenCount - 1;
+      this.texcoords.push(parseFloat(tokens[1]), parseFloat(tokens[2]));
+    }
  
-				if (s[0] === 'vn') {
-					let line = ProcessLineNumbers(this.content, i);
-					// console.log(s[0], line);
-				}
+    if (tokens[0] === 'vn') {
+      this.normals.push(tokens[1], tokens[2], tokens[3]);
+    }
 
-				if (s[0] === 'f') {
-					let line = ProcessLineNumbers(this.content, i);
-					this.indices.push(line[0]-1, line[1]-1, line[2]-1);
-				}
-			}
-			i+=s[1];
-		}
-	}
+    if (tokens[0] === 'f') {
+      const indicesCount = tokenCount - 1;
+      
+      // (TODO): Triangulate square face
+      if (indicesCount > 3) {
+      }
+      else {
+        for (let i = 1; i < 4; i++) {
+          const x = tokens[i].split('/');
+          const l = x.length;
+       					
+          if (l === 1) {
+            this.indices.push(x[0]-1);
+          }
+          if (l === 2) {	
+            this.indices.push(x[0]-1);
+            this.texindices.push(x[1]-1);
+          }
+          if (l === 3) {
+            this.indices.push(x[0]-1);	
+            this.texindices.push(x[1]-1);
+            this.normindices.push(x[2]-1);
+          }	
+        }
+      }
+    }
 
+    // Reindex faces?
+   
+  }
 }
-                                                                                                                                                                                                                          
+
+

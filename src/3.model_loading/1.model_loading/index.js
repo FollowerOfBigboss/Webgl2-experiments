@@ -141,9 +141,9 @@ function main() {
 		camera.ProcessMouseMovement(xoffset, yoffset);	
 	}, (event) => {
 		const wheelDelta = event.deltaY > 0 ? -1 : 1;
-		camera.init_1(glMatrix.vec3.fromValues(0.0, 0.0, 3.0));
+		camera.ProcessMouseScroll(wheelDelta);
 	});
-
+	
 	var model = new Model();
 	/*
 	model.getModelFromBuffer(buffer);
@@ -160,11 +160,11 @@ function main() {
 
 	var model = new Model();
 	var loaded = false;
-	model.getModelFromUrl("./monki.obj", (tthis) => {
+	model.getModelFromUrl("./backpack.obj", (tthis) => {
+	
 		vertices = tthis.positions;
 		indices = tthis.indices;
 
-		
 		gl.bindVertexArray(VAO);
 		gl.bindBuffer(gl.ARRAY_BUFFER, VBO);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -189,7 +189,6 @@ function main() {
 	gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 3 * Float32Array.BYTES_PER_ELEMENT, 0);
 	gl.enableVertexAttribArray(0);
     	*/
-
 	function render(now)
 	{
 		const currentFrame = Date.now() / 1000;
